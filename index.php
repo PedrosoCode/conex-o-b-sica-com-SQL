@@ -28,8 +28,27 @@ if(isset($_POST['submit'])) {
     $sql = "INSERT INTO users (username, email, address) VALUES ('$username', '$email', '$address')";
     if ($conn->query($sql) === TRUE) {
         echo "Novo registro criado com sucesso";
+        header("Location: ".$_SERVER['PHP_SELF']);
+        exit();
     } else {
         echo "Erro: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+// Operação de atualização (UPDATE)
+if(isset($_POST['update'])) {
+    $id = clean_input($_POST['id']);
+    $newUsername = clean_input($_POST['new_username']);
+    $newEmail = clean_input($_POST['new_email']);
+    $newAddress = clean_input($_POST['new_address']);
+    
+    $sql = "UPDATE users SET username='$newUsername', email='$newEmail', address='$newAddress' WHERE id=$id";
+    if ($conn->query($sql) === TRUE) {
+        echo "Registro atualizado com sucesso";
+        header("Location: ".$_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        echo "Erro ao atualizar registro: " . $conn->error;
     }
 }
 
@@ -45,6 +64,7 @@ if ($result->num_rows > 0) {
                 <th>Username</th>
                 <th>Email</th>
                 <th>Endereço</th>
+                <th>Ação</th>
             </tr>";
     while($row = $result->fetch_assoc()) {
         echo "<tr>
@@ -52,6 +72,15 @@ if ($result->num_rows > 0) {
                 <td>".$row["username"]."</td>
                 <td>".$row["email"]."</td>
                 <td>".$row["address"]."</td>
+                <td>
+                    <form method='post' action=''>
+                        <input type='hidden' name='id' value='".$row["id"]."'>
+                        <input type='text' name='new_username' placeholder='Novo username'>
+                        <input type='text' name='new_email' placeholder='Novo email'>
+                        <input type='text' name='new_address' placeholder='Novo endereço'>
+                        <input type='submit' name='update' value='Atualizar'>
+                    </form>
+                </td>
               </tr>";
     }
     echo "</table>";
